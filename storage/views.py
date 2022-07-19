@@ -1,5 +1,6 @@
 import uuid
 from django.http import HttpResponse
+from django.shortcuts import render
 from rest_framework.decorators import api_view
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import  status
@@ -7,7 +8,7 @@ from rest_framework.response import Response
 from .models import Asset, Timeline, TypeAsset, AssetDetail, Warehouse
 from .serializers import *
 from django.db import transaction
-
+import requests
 # Create your views here.
 
 
@@ -19,9 +20,16 @@ def get_type_api(request):
     if request.method == 'GET':
         type = TypeAsset.objects.all()
         serializer = TypeAssetSerializer(type, many=True)
-        return Response(serializer.data)     
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
 
-@swagger_auto_schema(tags=["type-asset-api"], methods=['POST',], request_body=TypeAssetSerializer)
+        return Response(response)     
+
+@swagger_auto_schema(tags=["type-asset-api"], method="POST", request_body=TypeAssetSerializer)
 @api_view(['POST',])
 def post_tpye_api(request):
     if request.method == 'POST':
@@ -42,9 +50,16 @@ def get_asset(request):
     if request.method == 'GET':
         assets = Asset.objects.all()
         serializer = AssetSerializer(assets, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
 
-@swagger_auto_schema(tags=["asset-api"], methods=['POST',], request_body=AssetSerializer)
+        return Response(response)
+
+@swagger_auto_schema(tags=["asset-api"], method="POST", request_body=AssetSerializer)
 @api_view(['POST',])
 def post_asset(request):
     if request.method == 'POST':
@@ -75,7 +90,14 @@ def get_asset_pk(request, pk, format=None):
 
     if request.method == 'GET':
         serializer = AssetSerializer(asset_item)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["asset-api"], method="PUT", request_body=AssetSerializer )
 @api_view(['PUT', ])
@@ -94,7 +116,7 @@ def update_asset_pk(request, pk, format=None):
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-@swagger_auto_schema(tags=["asset-api"], method='DELETE',)
+@swagger_auto_schema(tags=["asset-api"], method="DELETE",)
 @api_view(['DELETE', ])
 def delete_asset_pk(request, pk):
     try:
@@ -120,11 +142,18 @@ def delete_asset_pk(request, pk):
 @api_view(['GET', ])
 def get_asset_detail(request):
     if request.method == 'GET':
-        detail_asset = AssetDetail.objects.all().order_by('asset').distinct()
+        detail_asset = AssetDetail.objects.filter(commerce=False).order_by('asset').distinct()
         serializer = AssetDetailSerializer(detail_asset, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
 
-@swagger_auto_schema(tags=["asset-detail-api"], methods=['POST',], request_body=AssetDetailSerializer)
+        return Response(response)
+
+@swagger_auto_schema(tags=["asset-detail-api"], method="POST", request_body=AssetDetailSerializer)
 @api_view(['POST', ])
 def post_asset_detail(request):
     if request.method == 'POST':
@@ -149,10 +178,17 @@ def get_asset_detail_pk(request, id_asset, format=None):
         
     if request.method == 'GET':
         serializer = AssetDetailSerializer(asset_detail, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 
-@swagger_auto_schema(tags=["asset-detail-api"], method='DELETE',)
+@swagger_auto_schema(tags=["asset-detail-api"], method="DELETE",)
 @api_view(['DELETE', ])
 def delete_asset_detail_pk(request, id_asset):
     try:
@@ -182,7 +218,14 @@ def get_list_children(request, pk, format=None):
         
     if request.method == 'GET':
         serializer = AssetDetailSerializer(asset_detail, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["asset-detail-api"], method="GET", )
 @api_view(['GET', ])
@@ -194,9 +237,16 @@ def get_barcode(request, barcode, format=None):
         
     if request.method == 'GET':
         serializer = AssetDetailSerializer(barcode__pk, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
 
-@swagger_auto_schema(tags=["asset-detail-api"], methods=['PUT',], request_body=AssetDetailSerializer)
+        return Response(response)
+
+@swagger_auto_schema(tags=["asset-detail-api"], method="PUT", request_body=AssetDetailSerializer)
 @api_view(['PUT', ])
 def update_asset_detail(request, pk, format=None):
     try:
@@ -213,7 +263,7 @@ def update_asset_detail(request, pk, format=None):
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-@swagger_auto_schema(tags=["asset-detail-api"], method='DELETE',)
+@swagger_auto_schema(tags=["asset-detail-api"], method="DELETE",)
 @api_view(['Delete', ])
 def delete_asset_detail(request, pk):
     try:
@@ -234,19 +284,44 @@ def delete_asset_detail(request, pk):
             data["failture"] = "delete failed"    
         return Response(data=data)        
 
+@swagger_auto_schema(tags=["asset-detail-api"], method="GET" )
+@api_view(['GET', ])
+def get_commerce_products(request):
+    if request.method == 'GET':
+        detail_asset = AssetDetail.objects.filter(commerce=True).order_by('asset').distinct()
+        serializer = AssetDetailSerializer(detail_asset, many=True)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
+
+
+
+
 # -------------------END Asset Detail API----------------
 
 
 #---------------------Timeline API-----------------
-@swagger_auto_schema(tags=["timeline-api"],methods=['GET'], )
+@swagger_auto_schema(tags=["timeline-api"],method="GET", )
 @api_view(['GET', ])
 def get_timeline(request):
     if request.method == 'GET':
         timelines = Timeline.objects.all().order_by('detail_asset', 'created_time').distinct()
         serializer = TimelineSerializer(timelines, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
 
-@swagger_auto_schema(tags=["timeline-api"], methods=['POST'], request_body=TimelineSerializer)
+        return Response(response)
+
+@swagger_auto_schema(tags=["timeline-api"], method="POST", request_body=TimelineSerializer)
 @api_view(['POST', ])
 def post_timeline(request):
     if request.method == 'POST':
@@ -256,7 +331,7 @@ def post_timeline(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
 
-@swagger_auto_schema(tags=["timeline-api"], methods=['GET'],)
+@swagger_auto_schema(tags=["timeline-api"], method="GET",)
 @api_view(['GET', ])
 def get_timeline_pk(request, id_detail_asset, format=None):
     try:
@@ -266,10 +341,17 @@ def get_timeline_pk(request, id_detail_asset, format=None):
         
     if request.method == 'GET':
         serializer = TimelineSerializer(timeline_item, many=True)
-        return Response(serializer.data)                  
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)                  
 
 
-@swagger_auto_schema(tags=["timeline-api"], methods=['PUT'], request_body=TimelineSerializer)
+@swagger_auto_schema(tags=["timeline-api"], method="PUT", request_body=TimelineSerializer)
 @api_view(['PUT', ])
 def update_timeline(request, pk, format=None):
     try:
@@ -285,7 +367,7 @@ def update_timeline(request, pk, format=None):
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-@swagger_auto_schema(tags=["timeline-api"], methods=['DELETE'],)
+@swagger_auto_schema(tags=["timeline-api"], method="DELETE",)
 @api_view(['DELETE', ])
 def delete_timeline(request, pk, format=None):
     try:
@@ -311,7 +393,14 @@ def timeline_pk_manager(request, id_manager, format=None):
         
     if request.method == 'GET':
         serializer = TimelineSerializer(manager, many=True)
-        return Response(serializer.data) 
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["timeline-api"], method="GET", )  
 @api_view(['GET', ])   
@@ -323,7 +412,14 @@ def get_confirmed(request, id_manager):
         
     if request.method == 'GET':
         serializer = TimelineSerializer(manager, many=True)
-        return Response(serializer.data) 
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["timeline-api"], method="GET", )  
 @api_view(['GET',])
@@ -337,7 +433,14 @@ def get_lasted_timeline(request, id_asdetail, format=None):
         
     if request.method == 'GET':
         serializer = TimelineSerializer(timeline_item, many=True)
-        return Response(serializer.data) 
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response) 
 
 # -----------------End Timeline API------------------ 
 
@@ -349,7 +452,14 @@ def get_warehouse(request):
     if request.method == 'GET':
         timelines = Warehouse.objects.all()
         serializer = WarehouseSerializer(timelines, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["warehouse-api"], method="POST", request_body=WarehouseSerializer)        
 @api_view(['POST',])
@@ -361,9 +471,9 @@ def post_warehouse(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@swagger_auto_schema(methods=['put'], request_body=WarehouseSerializer)
-@api_view(['PUT', 'DELETE' ])
-def warehouse_pk(request, pk, format=None):
+@swagger_auto_schema(tags=["warehouse-api"], method="PUT", request_body=WarehouseSerializer)
+@api_view(['PUT', ])
+def update_warehouse(request, pk, format=None):
     try:
         warehouse = Warehouse.objects.get(pk=pk)
     except Warehouse.DoesNotExist:
@@ -376,7 +486,15 @@ def warehouse_pk(request, pk, format=None):
             data["success"] = "update succesful"
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-    elif request.method == 'DELETE':
+
+@swagger_auto_schema(tags=["warehouse-api"], method="DELETE", )
+@api_view(['DELETE', ])
+def delete_warehouse(request, pk):
+    try:
+        warehouse = Warehouse.objects.get(pk=pk)
+    except Warehouse.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'DELETE':
         operation = warehouse.delete()
         data = {}
         if operation:
@@ -385,4 +503,28 @@ def warehouse_pk(request, pk, format=None):
             data["failture"] = "delete failed"    
         return Response(data=data)
 # --------------------END Warehouse API------------------------
+
+#    ------------------Get API From PVS-----------------
+
+# ---------Assets Api--------------
+@swagger_auto_schema(tags=["GET-API-PVS"], method="GET")
+@api_view(['GET',  ])
+def get_assets_pvs(request):
+    if request.method == 'GET':
+        asset = Asset.objects.all()
+        serializer = AssetSerializer(asset, many=True)
+        api_url = ""
+        response_obj = requests.get(api_url)
+        
+        url_file = response_obj.json()
+        
+        for i in url_file:
+            print(i['name'])
+            check = Asset.objects.filter(sku=i['sku']).count()
+            if check == 0:
+                Asset.objects.create(
+                    id=i['id'], sku=i['sku'], name=i['name'], 
+                    quantity=i['quantity'], 
+                )
+                return Response(serializer.data)
 

@@ -8,7 +8,7 @@ from .views import ChangePasswordView
 
 
 urlpatterns = [
-    path('api/upload-users-xlsx', views.user_upload, name='user_upload'),
+    
     path('api/change-password', ChangePasswordView.as_view(), name='change-password'),
     #User uls
     path('api/get-users/', views.get_users),

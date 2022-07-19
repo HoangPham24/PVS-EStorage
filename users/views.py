@@ -28,7 +28,14 @@ def get_department(request):
         department = Department.objects.all()
         serializer = DepartmentSerializer(department, many=True)
         
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
         
 @swagger_auto_schema(tags=["department-api"], methods=['POST'], request_body=DepartmentSerializer)
 @api_view(['POST',])
@@ -48,9 +55,16 @@ def post_department(request):
 @api_view(['GET', ])
 def get_users(request):
     if request.method == 'GET':
-        users = User.objects.filter(is_active=True)
+        users = User.objects.filter(is_active=True).order_by('id')
         serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["users-api"], methods=['POST'], request_body=UserSerializer)
 @api_view(['POST',])
@@ -72,7 +86,14 @@ def get_user_username(request, email=None):
 
     if request.method == 'GET':
         serializer = UserSerializer(users)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["users-api"], methods=['DELETE'], )
 @api_view(['DELETE', ])
@@ -100,7 +121,14 @@ def get_staff(request):
     if request.method == 'GET':
         staffs = StaffProfile.objects.all()
         serializer = StaffSerializer(staffs, many=True)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["staff-api"], methods=['post'], request_body=StaffSerializer)
 @api_view(['POST'])
@@ -123,7 +151,14 @@ def get_staff_pk(request, pk, format=None):
 
     if request.method == 'GET':
         serializer = StaffSerializer(staffs)
-        return Response(serializer.data)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'data': serializer.data
+            }
+
+        return Response(response)
 
 @swagger_auto_schema(tags=["staff-api"], methods=['PUT',], request_body=StaffSerializer)
 @api_view(['PUT',])
@@ -197,34 +232,6 @@ class ChangePasswordView(generics.UpdateAPIView):
    
 # ----------------END Change password --------------------
 
-@api_view(['POST',])
-def user_upload(request):
-    if request.method == 'POST':
-        serializer = UserSerializer()
-        dataset = Dataset()
-        new_users = request.FILES['file']
-
-
-        imported_data = dataset.load(new_users.read(), format='xlsx')
-        
-        for data in imported_data:
-            value = User(
-                    data[0],
-                    data[1],
-                    data[2],
-                    data[3],
-                )
-            value.save() 
-            response = {
-                        'status': 'success',
-                        'code': status.HTTP_200_OK,
-                        'message': 'File updated successfully',
-                        'data': [serializer.data]
-                    }        
-            return Response(response)   
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)             
-    
-
 # ------------------Get API From PVS-----------------
 
 # ---------Staff Api--------------
@@ -271,3 +278,9 @@ def get_users_pvs(request):
                     password='PVS@@123456', is_staff=True
                 ) 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)                
+# ---------------------------END GET API----------------------
+# 
+# 
+        
+    
+                

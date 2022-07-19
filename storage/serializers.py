@@ -1,3 +1,4 @@
+from xml.parsers.expat import model
 from .models import *
 from users.serializers import StaffSerializer
 from rest_framework import serializers
@@ -18,6 +19,7 @@ class TypeAssetSerializer(serializers.ModelSerializer):
 
 class AssetSerializer(serializers.ModelSerializer):
     typeid =  serializers.SerializerMethodField('get_type')
+    
 
     class Meta:
         model = Asset
@@ -58,7 +60,7 @@ class AssetDetailSerializer(serializers.ModelSerializer):
             'id', 'asset','name', 'serial_no', 'barcode',
             'barcode_img', 'purpose', 'active', 'price', 'ip_source', 'warranty_time',	
             'created_at', 'updated_at', 'warehouse', 'warehouses',
-            'dependency', 'children', 'description'
+            'dependency', 'children', 'description', 'commerce'
         ]    
 
     def get_warehouse(self, obj):

@@ -1,4 +1,5 @@
 
+from xml.parsers.expat import model
 from django.db import models
 import os
 from users.models import StaffProfile
@@ -50,7 +51,7 @@ class Asset(models.Model):
     detail = models.TextField(blank=True, null=True,)
     img = models.ImageField(upload_to=locate_img_upload, blank=True, null=True)
     type = models.ForeignKey(TypeAsset, on_delete=models.SET_NULL, null=True, blank=True)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return self.name
@@ -67,7 +68,7 @@ class Asset(models.Model):
 class AssetDetail(models.Model):
        
     id = models.AutoField(primary_key=True)
-    asset = models.ForeignKey(Asset, on_delete=models.SET_NULL, null=True, blank=True)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     serial_no = models.CharField(max_length=200, blank=True, null=True)
     barcode = models.CharField(max_length=13, null=True, blank=True, unique=True)
     barcode_img = models.ImageField(upload_to=locate_barcode_img_upload,blank=True)
@@ -76,11 +77,12 @@ class AssetDetail(models.Model):
     price = models.CharField(max_length=200, blank=True, null=True)
     ip_source = models.CharField(max_length=100, null=True, blank=True)
     warranty_time = models. CharField(max_length=100, null=True, blank=True)
-    created_at = models.DateTimeField(blank=True, null=True,)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     dependency = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     description = models.TextField(blank=True, null=True,)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True, blank=True)
+    commerce = models.BooleanField(default=False)
     
     def __str__(self):
         return "{} - {}".format(self.dependency, self.asset)
@@ -112,10 +114,11 @@ class Timeline(models.Model):
     id = models.AutoField(primary_key=True)
     detail_asset = models.ForeignKey(AssetDetail, on_delete=models.SET_NULL, null=True, blank=True)
     manager = models.ForeignKey(StaffProfile, on_delete=models.PROTECT, null=True, blank=True) 
-    created_time = models.DateTimeField(blank=True, null=True, db_index=True)
+    created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True) 
     status = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     confirmed = models.BooleanField(default=False)
   
-    
+
+

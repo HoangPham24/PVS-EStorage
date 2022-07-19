@@ -44,7 +44,7 @@ class StaffProfile(models.Model):
 class UserManager(BaseUserManager):
     
     def _create_user(self, email, 
-                    password, is_staff, is_superuser, **extra_fields):
+                    password, is_staff, is_superuser,**extra_fields):
         
         email = self.normalize_email(email)
         user = self.model(email=email,
@@ -55,7 +55,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email=None, password=None, **extra_fields):
-        return self._create_user(email, password, is_superuser=False, **extra_fields)
+        return self._create_user(email, password,  is_superuser=False, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
         user = self._create_user(email, password, is_staff=True, 
