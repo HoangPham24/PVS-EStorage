@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/get-list-children/<int:pk>', views.get_list_children),
     path('api/get-barcode/<int:barcode>',views.get_barcode),
     path('api/get-commerce-products', views.get_commerce_products),
+    path('api/get-10-detail', views.get_10_detail),
     #Timeline urls
     path('api/get-timeline', views.get_timeline),
     path('api/post-timeline', views.post_timeline),
@@ -36,6 +37,7 @@ urlpatterns = [
     path('api/post_warehouse', views.post_warehouse),  
     path('api/update-warehouse/<int:pk>', views.update_warehouse),
     path('api/delete-warehouse/<int:pk>', views.delete_warehouse),
+    path('api/get_warehouse_total/<int:pk>', views.get_warehouse_totals),
 
     #get api pvssolution
     path('get-asset-api-pvs', views.get_assets_pvs),

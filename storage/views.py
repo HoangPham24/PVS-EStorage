@@ -8,8 +8,86 @@ from rest_framework.response import Response
 from .models import Asset, Timeline, TypeAsset, AssetDetail, Warehouse
 from .serializers import *
 from django.db import transaction
+from django.db.models import Sum
 import requests
 # Create your views here.
+
+# --------------------Warehouse API------------------------
+@swagger_auto_schema(tags=["warehouse-api"], method="GET")
+@api_view(['GET', ])
+def get_warehouse_totals(request, pk):
+    try:
+        warehouse = Warehouse.objects.get(pk=pk)
+    except Warehouse.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        total = AssetDetail.objects.filter(warehouse_id=warehouse).aggregate(TOTAL= Sum('price'))['TOTAL']
+        print (total)
+        serializer = WarehouseSerializer(warehouse)
+        response = {
+            'status': 'success',
+            'code': status.HTTP_200_OK,
+            'message': 'GET-TOTAL-SUCCESS',
+            'data': serializer.data,
+            'Total': total
+        }
+
+        return Response(response)
+
+
+@swagger_auto_schema(tags=["warehouse-api"], method="GET", )
+@api_view(['GET',])
+def get_warehouse(request):
+    if request.method == 'GET':
+        warehouse = Warehouse.objects.all()
+        serializer = WarehouseSerializer(warehouse, many=True)
+        return Response(serializer.data)
+
+ 
+
+@swagger_auto_schema(tags=["warehouse-api"], method="POST", request_body=WarehouseSerializer)        
+@api_view(['POST',])
+def post_warehouse(request):
+    if request.method == 'POST':
+        serializer = WarehouseSerializer(data=request.data) 
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(tags=["warehouse-api"], method="PUT", request_body=WarehouseSerializer)
+@api_view(['PUT', ])
+def update_warehouse(request, pk, format=None):
+    try:
+        warehouse = Warehouse.objects.get(pk=pk)
+    except Warehouse.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'PUT':
+        serializer = WarehouseSerializer(warehouse, data=request.data, partial = True)
+        data = {}
+        if serializer.is_valid():
+            serializer.save() 
+            data["success"] = "update succesful"
+            return Response(data=data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+@swagger_auto_schema(tags=["warehouse-api"], method="DELETE", )
+@api_view(['DELETE', ])
+def delete_warehouse(request, pk):
+    try:
+        warehouse = Warehouse.objects.get(pk=pk)
+    except Warehouse.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'DELETE':
+        operation = warehouse.delete()
+        data = {}
+        if operation:
+            data["success"] = "delete successful"
+        else:
+            data["failture"] = "delete failed"    
+        return Response(data=data)
+# --------------------END Warehouse API------------------------
 
 
 #---------------TypeAsset API-------------
@@ -193,6 +271,7 @@ def get_asset_detail_pk(request, id_asset, format=None):
 def delete_asset_detail_pk(request, id_asset):
     try:
         asset_detail = AssetDetail.objects.filter(asset__pk=id_asset)
+        
     except AssetDetail.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)  
     if request.method == 'DELETE':
@@ -251,6 +330,7 @@ def get_barcode(request, barcode, format=None):
 def update_asset_detail(request, pk, format=None):
     try:
         asset_detail = AssetDetail.objects.get(pk=pk)
+        
     except AssetDetail.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)   
 
@@ -299,7 +379,22 @@ def get_commerce_products(request):
 
         return Response(response)
 
+@swagger_auto_schema(tags=["asset-detail-api"], method="GET", )  
+@api_view(['GET',])
+def get_10_detail(request, format=None):
+    if request.method == 'GET':
+        detail = AssetDetail.objects.all().order_by('-created_at')[:10]
+        count = detail.count()
+        serializer = AssetDetailSerializer(detail, many=True)
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'GET-DATA-SUCCESS',
+                'count': count,
+                'data': serializer.data
+            }
 
+        return Response(response)         
 
 
 # -------------------END Asset Detail API----------------
@@ -445,64 +540,7 @@ def get_lasted_timeline(request, id_asdetail, format=None):
 # -----------------End Timeline API------------------ 
 
 
-# --------------------Warehouse API------------------------
-@swagger_auto_schema(tags=["warehouse-api"], method="GET", )
-@api_view(['GET',])
-def get_warehouse(request):
-    if request.method == 'GET':
-        timelines = Warehouse.objects.all()
-        serializer = WarehouseSerializer(timelines, many=True)
-        response = {
-                'status': 'success',
-                'code': status.HTTP_200_OK,
-                'message': 'GET-DATA-SUCCESS',
-                'data': serializer.data
-            }
 
-        return Response(response)
-
-@swagger_auto_schema(tags=["warehouse-api"], method="POST", request_body=WarehouseSerializer)        
-@api_view(['POST',])
-def post_warehouse(request):
-    if request.method == 'POST':
-        serializer = WarehouseSerializer(data=request.data) 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@swagger_auto_schema(tags=["warehouse-api"], method="PUT", request_body=WarehouseSerializer)
-@api_view(['PUT', ])
-def update_warehouse(request, pk, format=None):
-    try:
-        warehouse = Warehouse.objects.get(pk=pk)
-    except Warehouse.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'PUT':
-        serializer = WarehouseSerializer(warehouse, data=request.data, partial = True)
-        data = {}
-        if serializer.is_valid():
-            serializer.save() 
-            data["success"] = "update succesful"
-            return Response(data=data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-
-@swagger_auto_schema(tags=["warehouse-api"], method="DELETE", )
-@api_view(['DELETE', ])
-def delete_warehouse(request, pk):
-    try:
-        warehouse = Warehouse.objects.get(pk=pk)
-    except Warehouse.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'DELETE':
-        operation = warehouse.delete()
-        data = {}
-        if operation:
-            data["success"] = "delete successful"
-        else:
-            data["failture"] = "delete failed"    
-        return Response(data=data)
-# --------------------END Warehouse API------------------------
 
 #    ------------------Get API From PVS-----------------
 
@@ -513,8 +551,8 @@ def get_assets_pvs(request):
     if request.method == 'GET':
         asset = Asset.objects.all()
         serializer = AssetSerializer(asset, many=True)
-        api_url = ""
-        response_obj = requests.get(api_url)
+        api_url = "https://api-estorage.pvssolution.com/upload/get-asset-api-pvs"
+        response_obj = requests.get(api_url)['data']
         
         url_file = response_obj.json()
         
@@ -523,7 +561,8 @@ def get_assets_pvs(request):
             check = Asset.objects.filter(sku=i['sku']).count()
             if check == 0:
                 Asset.objects.create(
-                    id=i['id'], sku=i['sku'], name=i['name'], 
+                    id=i['id'], sku=str('PVS-') + str(uuid.uuid4().int)[:7], 
+                    name=i['name'], 
                     quantity=i['quantity'], 
                 )
                 return Response(serializer.data)

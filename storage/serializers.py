@@ -1,15 +1,17 @@
+from importlib.util import source_hash
 from xml.parsers.expat import model
 from .models import *
 from users.serializers import StaffSerializer
 from rest_framework import serializers
 import uuid
 
-
+from django.db.models import Sum
 
 class WarehouseSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Warehouse
-        fields = ['id', 'name', 'address']
+        fields = '__all__'
 
 
 class TypeAssetSerializer(serializers.ModelSerializer):
@@ -46,7 +48,7 @@ class AssetSerializer(serializers.ModelSerializer):
 class AssetNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
-        fields = ['name']
+        fields = ['id', 'sku', 'name', 'img']
 
 class AssetDetailSerializer(serializers.ModelSerializer):
     name =  serializers.SerializerMethodField('get_asset_name')

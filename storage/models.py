@@ -45,13 +45,14 @@ class Asset(models.Model):
     sku = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=200)
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     branch = models.CharField(max_length=100, null=True, blank=True)
     detail = models.TextField(blank=True, null=True,)
     img = models.ImageField(upload_to=locate_img_upload, blank=True, null=True)
     type = models.ForeignKey(TypeAsset, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
+    asdt = models.ManyToManyField('AssetDetail', null=True, blank=True, related_name='asset_detail')
     
     def __str__(self):
         return self.name
@@ -74,14 +75,14 @@ class AssetDetail(models.Model):
     barcode_img = models.ImageField(upload_to=locate_barcode_img_upload,blank=True)
     purpose = models.TextField(blank=True, null=True,)
     active = models.BooleanField(default=True)
-    price = models.CharField(max_length=200, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True)
     ip_source = models.CharField(max_length=100, null=True, blank=True)
     warranty_time = models. CharField(max_length=100, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     dependency = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     description = models.TextField(blank=True, null=True,)
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True, blank=True)
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True, blank=True, related_name='warehouse')
     commerce = models.BooleanField(default=False)
     
     def __str__(self):
@@ -100,7 +101,7 @@ class AssetDetail(models.Model):
         COD128 = barcode.get_barcode_class('code128')
         rv = BytesIO()
         code = COD128(f'{self.barcode}', writer=ImageWriter()).write(rv)
-        self.barcode_img.save(f'{self.asset}.png', File(rv), save=False)
+        self.barcode_img.save(f'{self.barcode}.png', File(rv), save=False)
         return super().save(*args, **kwargs)
             
         
