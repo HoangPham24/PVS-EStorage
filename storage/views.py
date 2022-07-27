@@ -147,11 +147,13 @@ def post_asset(request):
             #get quantity asset
             quantity = asset.quantity 
             #auto add detail
+            purpose = ""
             for i in range(quantity):
                 AssetDetail.objects.create(
                     asset_id=asset.id, 
                     #generator barcode post asset
-                    barcode = str(uuid.uuid4().int)[:13],   
+                    barcode = str(uuid.uuid4().int)[:13],  
+                    purpose = purpose,
                     
                 )
             
@@ -501,7 +503,8 @@ def timeline_pk_manager(request, id_manager, format=None):
 @api_view(['GET', ])   
 def get_confirmed(request, id_manager):
     try:
-        manager = Timeline.objects.filter(manager__pk=id_manager, confirmed=False)
+        manager = Timeline.objects.filter(manager__pk=id_manager, detail_asset__commerce=False, confirmed=False)
+        
     except Timeline.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)  
         
@@ -545,25 +548,3 @@ def get_lasted_timeline(request, id_asdetail, format=None):
 #    ------------------Get API From PVS-----------------
 
 # ---------Assets Api--------------
-@swagger_auto_schema(tags=["GET-API-PVS"], method="GET")
-@api_view(['GET',  ])
-def get_assets_pvs(request):
-    if request.method == 'GET':
-        asset = Asset.objects.all()
-        serializer = AssetSerializer(asset, many=True)
-        api_url = "https://api-estorage.pvssolution.com/upload/get-asset-api-pvs"
-        response_obj = requests.get(api_url)['data']
-        
-        url_file = response_obj.json()
-        
-        for i in url_file:
-            print(i['name'])
-            check = Asset.objects.filter(sku=i['sku']).count()
-            if check == 0:
-                Asset.objects.create(
-                    id=i['id'], sku=str('PVS-') + str(uuid.uuid4().int)[:7], 
-                    name=i['name'], 
-                    quantity=i['quantity'], 
-                )
-                return Response(serializer.data)
-

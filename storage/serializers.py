@@ -49,7 +49,7 @@ class AssetNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = ['id', 'sku', 'name', 'img']
-
+    
 class AssetDetailSerializer(serializers.ModelSerializer):
     name =  serializers.SerializerMethodField('get_asset_name')
     children = serializers.SerializerMethodField(
@@ -94,12 +94,13 @@ class AssetDetailSerializer(serializers.ModelSerializer):
 class TimelineSerializer(serializers.ModelSerializer):
     as_detail_fk = serializers.SerializerMethodField('get_as_detail')
     manager_fk = serializers.SerializerMethodField('get_manager')
+    fromStaff_fk = serializers.SerializerMethodField('get_staff')
     class Meta:
         model = Timeline
         fields = [
             'id', 'detail_asset', 'as_detail_fk',
             'manager', 'manager_fk', 'created_time',
-            'updated_time', 'status', 'address', 'confirmed'
+            'updated_time', 'status', 'address', 'confirmed', 'fromStaff', 'fromStaff_fk'
         ]
 
 
@@ -117,4 +118,10 @@ class TimelineSerializer(serializers.ModelSerializer):
             return serializer.data
         return {}
 
+    def get_staff(self, obj):
+        if obj.fromStaff:
+            manager = StaffProfile.objects.filter(user=obj.fromStaff.user).first()
+            serializer = StaffSerializer(manager)
+            return serializer.data
+        return {}
 

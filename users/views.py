@@ -10,6 +10,7 @@ from rest_framework import  status, generics, viewsets
 from rest_framework.response import Response 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated 
+from django.db import transaction
 
 
 
@@ -181,10 +182,13 @@ def update_staff_pk(request, pk, format=None):
 def delete_staff_pk(request, pk, format=None):
     try:
         staffs = StaffProfile.objects.get(pk=pk)
+        user = staffs.user_id  
     except StaffProfile.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)   
     if request.method == 'DELETE':
-        operation = staffs.delete()
+        with transaction.atomic():
+            operation = staffs.delete()
+            User.objects.filter(id=user).delete()
         data = {}
         if operation:
             data["success"] = "delete successful"

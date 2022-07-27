@@ -26,7 +26,7 @@ class StaffProfile(models.Model):
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     joined = models.DateField(blank=True, null=True)
     contract = models.DateField(blank=True, null=True)
-    position = models.CharField(max_length=30)
+    position = models.CharField(max_length=30, null=True, blank=True)
     phone = models.CharField(max_length=13)
 
     def __str__(self):

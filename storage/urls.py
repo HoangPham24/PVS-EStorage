@@ -39,7 +39,5 @@ urlpatterns = [
     path('api/delete-warehouse/<int:pk>', views.delete_warehouse),
     path('api/get_warehouse_total/<int:pk>', views.get_warehouse_totals),
 
-    #get api pvssolution
-    path('get-asset-api-pvs', views.get_assets_pvs),
 
 ]

@@ -15,9 +15,9 @@ from django.core.files import File
 
 # locate img upload
 def locate_img_upload(instance, filename):
-    return os.path.join("assets-img/{}/{}".format(instance.name,filename))
+    return os.path.join("assets-img/{}/{}".format(instance.sku,filename))
 def locate_barcode_img_upload(instance, filename):
-    return os.path.join("assets-img/{}/{}".format(instance.asset, filename))
+    return os.path.join("assets-img/{}/{}".format(instance.barcode, filename))
 
 #Warehouse models
 class Warehouse(models.Model):
@@ -43,7 +43,7 @@ class Asset(models.Model):
 
     id = models.AutoField(primary_key=True)
     sku = models.CharField(max_length=20, blank=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=1000)
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -52,7 +52,6 @@ class Asset(models.Model):
     img = models.ImageField(upload_to=locate_img_upload, blank=True, null=True)
     type = models.ForeignKey(TypeAsset, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    asdt = models.ManyToManyField('AssetDetail', null=True, blank=True, related_name='asset_detail')
     
     def __str__(self):
         return self.name
@@ -120,6 +119,6 @@ class Timeline(models.Model):
     status = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     confirmed = models.BooleanField(default=False)
-  
+    fromStaff = models.ForeignKey(StaffProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='fromStaff')
 
 

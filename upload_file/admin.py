@@ -3,5 +3,11 @@ from .models import *
 
 # Register your models here.
 
+class GetApiAdmin(admin.ModelAdmin):
+    
+    model = GetApiPVS
+    list_display = ['id', 'content', 'creator']
 
-admin.site.register(GetApi)
+
+admin.site.register(GetApiPVS, GetApiAdmin)
+admin.site.register(ExcelFile)
