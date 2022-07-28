@@ -1,17 +1,12 @@
 from importlib.util import source_hash
+from tkinter import W
 from xml.parsers.expat import model
 from .models import *
-from users.serializers import StaffSerializer
+from users.serializers import StaffNameSerializer
 from rest_framework import serializers
 import uuid
 
 from django.db.models import Sum
-
-class WarehouseSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Warehouse
-        fields = '__all__'
 
 
 class TypeAssetSerializer(serializers.ModelSerializer):
@@ -114,14 +109,46 @@ class TimelineSerializer(serializers.ModelSerializer):
     def get_manager(self, obj):
         if obj.manager:
             manager = StaffProfile.objects.filter(user=obj.manager.user).first()
-            serializer = StaffSerializer(manager)
+            serializer = StaffNameSerializer(manager)
             return serializer.data
         return {}
 
     def get_staff(self, obj):
         if obj.fromStaff:
             manager = StaffProfile.objects.filter(user=obj.fromStaff.user).first()
-            serializer = StaffSerializer(manager)
+            serializer = StaffNameSerializer(manager)
             return serializer.data
         return {}
 
+class DetailWarehouse(serializers.ModelSerializer):
+    
+    asset = AssetNameSerializer(read_only=True)
+    class Meta:
+        model = AssetDetail
+        fields = [
+            'id', 'asset', 'serial_no', 'barcode',
+            'barcode_img', 'purpose', 'active', 'price', 'ip_source', 'warranty_time',	
+            'created_at', 'updated_at', 'warehouse', 
+            'dependency', 'description', 'commerce'
+        ]    
+    
+
+class WarehouseSerializer(serializers.ModelSerializer):
+    total = serializers.SerializerMethodField('get_total')
+    list_detail = DetailWarehouse(many=True, read_only=True)
+    count = serializers.SerializerMethodField('get_count')
+    class Meta:
+        model = Warehouse
+        fields = ['id', 'name', 'address', 'count', 'total', 'list_detail']
+
+    def get_total(self, obj):
+        warehouse = Warehouse.objects.get(pk=obj.pk)
+        total = AssetDetail.objects.filter(warehouse_id=warehouse).aggregate(TOTAL= Sum('price'))['TOTAL']
+        return total
+
+    def get_count(self, obj):
+        warehouse = Warehouse.objects.get(pk=obj.pk)
+        count = AssetDetail.objects.filter(warehouse_id=warehouse).count()
+        return count
+
+    

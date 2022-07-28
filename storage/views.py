@@ -9,31 +9,10 @@ from .models import Asset, Timeline, TypeAsset, AssetDetail, Warehouse
 from .serializers import *
 from django.db import transaction
 from django.db.models import Sum
-import requests
+
 # Create your views here.
 
 # --------------------Warehouse API------------------------
-@swagger_auto_schema(tags=["warehouse-api"], method="GET")
-@api_view(['GET', ])
-def get_warehouse_totals(request, pk):
-    try:
-        warehouse = Warehouse.objects.get(pk=pk)
-    except Warehouse.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'GET':
-        total = AssetDetail.objects.filter(warehouse_id=warehouse).aggregate(TOTAL= Sum('price'))['TOTAL']
-        print (total)
-        serializer = WarehouseSerializer(warehouse)
-        response = {
-            'status': 'success',
-            'code': status.HTTP_200_OK,
-            'message': 'GET-TOTAL-SUCCESS',
-            'data': serializer.data,
-            'Total': total
-        }
-
-        return Response(response)
-
 
 @swagger_auto_schema(tags=["warehouse-api"], method="GET", )
 @api_view(['GET',])
@@ -43,7 +22,6 @@ def get_warehouse(request):
         serializer = WarehouseSerializer(warehouse, many=True)
         return Response(serializer.data)
 
- 
 
 @swagger_auto_schema(tags=["warehouse-api"], method="POST", request_body=WarehouseSerializer)        
 @api_view(['POST',])
@@ -540,11 +518,11 @@ def get_lasted_timeline(request, id_asdetail, format=None):
 
         return Response(response) 
 
+
+
 # -----------------End Timeline API------------------ 
 
 
 
 
-#    ------------------Get API From PVS-----------------
 
-# ---------Assets Api--------------

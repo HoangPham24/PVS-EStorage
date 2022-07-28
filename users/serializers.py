@@ -21,7 +21,18 @@ class UserIDSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "email"]    
         
+class StaffNameSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField('get_user')
+    class Meta:
+        model = StaffProfile
+        fields = ["user", "name", "position"]
 
+    def get_user(self, obj):
+        if obj.user:
+            users = User.objects.filter(id=obj.user.id).first()
+            serializer = UserIDSerializer(users)
+            return serializer.data
+        return {}     
 class StaffSerializer(serializers.ModelSerializer):
     departmentid = serializers.SerializerMethodField('get_department')
     user_id = serializers.SerializerMethodField('get_user')

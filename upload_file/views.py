@@ -128,9 +128,6 @@ def upload_file_asset(request):
         status["success"] = "Upload file successfull!!"  
     return Response(status)
                       
-                        
-
-
 
 def get_simple_table_data():
     # Simulate a more complex table read.
@@ -172,6 +169,3 @@ def download(request):
 
    
     
-    
-
-

@@ -81,7 +81,7 @@ class AssetDetail(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     dependency = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     description = models.TextField(blank=True, null=True,)
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True, blank=True, related_name='warehouse')
+    warehouse = models.ForeignKey('Warehouse', on_delete=models.SET_NULL, null=True, blank=True, related_name='list_detail')
     commerce = models.BooleanField(default=False)
     
     def __str__(self):

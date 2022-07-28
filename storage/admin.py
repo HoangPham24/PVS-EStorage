@@ -5,7 +5,7 @@ from import_export.admin import ImportExportActionModelAdmin
 
 class AssetDetailAdmin(ImportExportActionModelAdmin):
     model = AssetDetail
-    list_display = ["asset", "barcode", "price", "dependency", "commerce" ]
+    list_display = ["asset", "barcode", "price", "dependency", "commerce", "warehouse" ]
 
 
 class TypeAssetAdmin(ImportExportActionModelAdmin):
