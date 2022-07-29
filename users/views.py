@@ -236,55 +236,5 @@ class ChangePasswordView(generics.UpdateAPIView):
    
 # ----------------END Change password --------------------
 
-# ------------------Get API From PVS-----------------
-
-# ---------Staff Api--------------
-@swagger_auto_schema(tags=["GET-API-PVS"], methods=["GET",])
-@api_view(['GET',  ])
-def get_staff_pvs(request):
-    if request.method == 'GET':
-        staffs = StaffProfile.objects.all()
-        serializer = StaffSerializer(staffs, many=True)
-        api_url = "https://pvs.com.vn/user-api/get-list-staff-profile"
-        response_obj = requests.get(api_url)
-        
-        url_file = response_obj.json()['data']
-        
-        for i in url_file:
-            print(i['user'])
-            users = User.objects.get(id=i['user']['id'])
-            check = StaffProfile.objects.filter(user=users).count()
-            if check == 0:
-                StaffProfile.objects.create(
-                    user=users, name=i['name'], 
-                    position=i['position'],
-                ) 
-                return Response(serializer.data)
-
-# --------------Users APi-------
-@swagger_auto_schema(tags=["GET-API-PVS"], methods=['GET'], )
-@api_view(['GET', ])
-def get_users_pvs(request):
-    if request.method == 'GET':
-        users = User.objects.filter(is_active=True)
-        serializer = UserSerializer(users, many=True)
-        api_url = "https://pvs.com.vn/user-api/get-list-staff-profile"
-        api_request = requests.get(api_url)
-        
-        url_file = api_request.json()['data']
-        
-        for i in url_file:
-            print(i['user'])
-            check = User.objects.filter(email=i['user']['email']).count()
-            if check == 0:
-                User.objects.create_user(
-                    id=i['user']['id'], email=i['user']['email'], 
-                    password='PVS@@123456', is_staff=True
-                ) 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)                
-# ---------------------------END GET API----------------------
-# 
-# 
-        
     
                 

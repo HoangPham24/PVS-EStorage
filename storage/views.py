@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from .models import Asset, Timeline, TypeAsset, AssetDetail, Warehouse
 from .serializers import *
 from django.db import transaction
-from django.db.models import Sum
+
 
 # Create your views here.
 
@@ -500,7 +500,7 @@ def get_confirmed(request, id_manager):
 @swagger_auto_schema(tags=["timeline-api"], method="GET", )  
 @api_view(['GET',])
 def get_lasted_timeline(request, id_asdetail, format=None):
-    try:
+    try: 
         timeline_item = Timeline.objects.filter(
             detail_asset__pk=id_asdetail
         ).order_by('-created_time')[:2]
@@ -521,8 +521,6 @@ def get_lasted_timeline(request, id_asdetail, format=None):
 
 
 # -----------------End Timeline API------------------ 
-
-
 
 
 

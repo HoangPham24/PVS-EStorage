@@ -38,5 +38,6 @@ urlpatterns = [
     path('api/update-warehouse/<int:pk>', views.update_warehouse),
     path('api/delete-warehouse/<int:pk>', views.delete_warehouse),
 
+    
 
 ]
