@@ -1,5 +1,3 @@
-
-from xml.parsers.expat import model
 from django.db import models
 import os
 from users.models import StaffProfile

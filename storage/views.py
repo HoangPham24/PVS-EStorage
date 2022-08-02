@@ -1,6 +1,4 @@
 import uuid
-from django.http import HttpResponse
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import  status
@@ -8,7 +6,6 @@ from rest_framework.response import Response
 from .models import Asset, Timeline, TypeAsset, AssetDetail, Warehouse
 from .serializers import *
 from django.db import transaction
-from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 

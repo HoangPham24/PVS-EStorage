@@ -1,12 +1,8 @@
-
-from django.shortcuts import render
-from django.http import HttpResponse
-import requests
 from .models import *
 from .serializers import  (UserSerializer, StaffSerializer, DepartmentSerializer, 
-                        UserIDSerializer, ChangePasswordSerializer)
+                        ChangePasswordSerializer)
 from rest_framework.decorators import api_view
-from rest_framework import  status, generics, viewsets
+from rest_framework import  status, generics
 from rest_framework.response import Response 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated 

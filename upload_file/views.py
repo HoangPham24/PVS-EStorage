@@ -1,4 +1,3 @@
-
 from rest_framework.decorators import  api_view
 from storage.models import Asset, AssetDetail, Timeline
 from rest_framework.response import Response
@@ -159,7 +158,7 @@ def download(request):
 
     # Rewind the buffer.
     output.seek(0)
-
+    
     # Set up the Http response.
     filename = 'asset.xlsx'
     response = HttpResponse(

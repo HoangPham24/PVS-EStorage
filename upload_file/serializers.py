@@ -1,4 +1,3 @@
-from xml.parsers.expat import model
 from .models import *
 from rest_framework import serializers
 from users.serializers import UserIDSerializer
