@@ -141,28 +141,26 @@ def get_simple_table_data():
 
 @api_view(['GET',])
 def download(request):
-  
+ 
     output = io.BytesIO()
 
-        
     workbook = xlsxwriter.Workbook(output)
     worksheet = workbook.add_worksheet()
 
-       
     data = get_simple_table_data()
 
-        # Write some test data.
+    # Write some test data.
     for row_num, columns in enumerate(data):
         for col_num, cell_data in enumerate(columns):
             worksheet.write(row_num, col_num, cell_data)
 
-        # Close the workbook before sending the data.
+    # Close the workbook before sending the data.
     workbook.close()
 
-        # Rewind the buffer.
+    # Rewind the buffer.
     output.seek(0)
 
-        # Set up the Http response.
+    # Set up the Http response.
     filename = 'asset.xlsx'
     response = HttpResponse(
         output,
