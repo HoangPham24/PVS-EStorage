@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from .models import Asset, Timeline, TypeAsset, AssetDetail, Warehouse
 from .serializers import *
 from django.db import transaction
-
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
@@ -200,8 +200,9 @@ def delete_asset_pk(request, pk):
 @api_view(['GET', ])
 def get_asset_detail(request):
     if request.method == 'GET':
-        detail_asset = AssetDetail.objects.filter(commerce=False).order_by('asset').distinct()
-        serializer = AssetDetailSerializer(detail_asset, many=True)
+        objects = AssetDetail.objects.filter(commerce=False).order_by('-asset').distinct()
+
+        serializer = AssetDetailSerializer(objects, many=True)
         response = {
                 'status': 'success',
                 'code': status.HTTP_200_OK,

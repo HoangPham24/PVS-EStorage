@@ -10,4 +10,3 @@ class GetApiAdmin(admin.ModelAdmin):
 
 
 admin.site.register(GetApiPVS, GetApiAdmin)
-admin.site.register(ExcelFile)

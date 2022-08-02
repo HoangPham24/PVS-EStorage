@@ -20,7 +20,3 @@ class GetCreated(serializers.ModelSerializer):
     class Meta:
         model = GetApiPVS
         fields = '__all__'
-
-class File(serializers.ModelSerializer):
-    class Meta:
-        model = ExcelFile

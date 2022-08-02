@@ -1,6 +1,6 @@
 
 from rest_framework.decorators import  api_view
-from storage.models import Asset, AssetDetail
+from storage.models import Asset, AssetDetail, Timeline
 from rest_framework.response import Response
 from django.core.files.storage import FileSystemStorage
 from rest_framework import  status
@@ -36,7 +36,7 @@ def post_pvs_asset_api(request):
         if serializer.is_valid():
             api = serializer.save()
             ct = api.content
-            
+            creator = api.creator
             for i in ct.split('\n'):
                 k = i.split(';')
                 asset = Asset.objects.create(
@@ -44,14 +44,20 @@ def post_pvs_asset_api(request):
                     name = k[1],
                     quantity = int(k[2]),
                 )   
-                # asset = Asset.objects.get(name=k[1])
                 quantity = asset.quantity
                 for s in range(quantity):
-                    AssetDetail.objects.create(
+                    detail = AssetDetail.objects.create(
                         asset_id = asset.id,
                         barcode = str(uuid.uuid4().int)[:13], 
                         price = k[3]
-                    )               
+                    ) 
+                for t in range(quantity):
+                    Timeline.objects.create(
+                        detail_asset_id= detail.id,
+                        manager_id=creator.id,
+                        confirmed=True,
+                        fromStaff_id=creator.id
+                    )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
@@ -119,8 +125,7 @@ def upload_file_asset(request):
                             price = price,
                             commerce = True
                         )
-                    
-
+            
                 total = AssetDetail.objects.filter(asset_id=asset.id).count()
                 print (total)
                 asset.quantity = total 

@@ -10,5 +10,4 @@ class GetApiPVS(models.Model):
     content = models.TextField()
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
-class ExcelFile(models.Model):
-    file = models.FileField(upload_to="media")    
+ 

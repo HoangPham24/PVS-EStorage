@@ -112,7 +112,7 @@ class Timeline(models.Model):
         ordering = ['created_time']
 
     id = models.AutoField(primary_key=True)
-    detail_asset = models.ForeignKey(AssetDetail, on_delete=models.SET_NULL, null=True, blank=True)
+    detail_asset = models.ForeignKey(AssetDetail, on_delete=models.CASCADE, null=True, blank=True)
     manager = models.ForeignKey(StaffProfile, on_delete=models.PROTECT, null=True, blank=True) 
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True) 
